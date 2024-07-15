@@ -1,9 +1,11 @@
 FROM ckan/ckan-base:2.10.4
 
-RUN pip install pipenv --user
-ENV PATH="/root/.local/bin:$PATH"
-COPY Pipfile Pipfile.lock ${APP_DIR}/
-RUN cd ${APP_DIR} && pipenv install --deploy --system
+ENV VENV /ckan/venv
+RUN python -m venv $VENV
+ENV PATH="$VENV/bin:$PATH"
+
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt
 
 # Install any extensions needed by your CKAN instance
 # See Dockerfile.dev for more details and examples

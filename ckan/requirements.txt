@@ -1,0 +1,1 @@
+-e git+https://github.com/datopian/ckanext-authz-service.git@master#egg=ckanext-authz-service
