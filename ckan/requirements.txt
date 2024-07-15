@@ -1,1 +1,3 @@
 -e git+https://github.com/datopian/ckanext-authz-service.git@master#egg=ckanext-authz-service
+-e git+https://github.com/ckan/ckanext-scheming.git@master#egg=ckanext-scheming
+-e git+https://github.com/ckan/ckanext-dcat.git@master#egg=ckanext-dcat
