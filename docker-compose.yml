@@ -95,7 +95,23 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "-e", "QUIT"]
-    
+
+
+  giftless:
+    image: datopian/giftless
+    command: >
+      -M -T --threads 2 -p 2 --manage-script-name --callable app --http 0.0.0.0:8080
+    ports:
+      - "8080:8080"
+    networks:
+      - ckannet
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
 networks:
   webnet:
   ckannet:
