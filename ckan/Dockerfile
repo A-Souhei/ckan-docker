@@ -30,4 +30,4 @@ RUN pipx install poetry
 
 # Switch to the application directory and initialize poetry
 WORKDIR ${APP_DIR}
-RUN poetry init
+RUN poetry init --no-interaction --name=ckan --description="CKAN project" --author="CKAN Team <team@ckan.org>" --dependency=flask@^2.0
