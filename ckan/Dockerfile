@@ -18,7 +18,16 @@ RUN for d in $APP_DIR/patches/*; do \
         fi ; \
     done
 
-# Installing Pipx \
+# Install pipx and ensure the path is set correctly
 RUN python3 -m pip install --user pipx && \
-    python3 -m pipx ensurepath
+    python3 -m pipx ensurepath && \
+    source ~/.profile
 
+
+# Add pipx to PATH
+ENV PATH=/root/.local/bin:$PATH
+RUN pipx install poetry
+
+# Switch to the application directory and initialize poetry
+WORKDIR ${APP_DIR}
+RUN poetry init
