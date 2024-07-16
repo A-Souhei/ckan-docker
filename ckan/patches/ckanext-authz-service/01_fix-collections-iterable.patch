@@ -1,0 +1,10 @@
+--- a/ckanext/authz_service/authzzie.py
++++ b/ckanext/authz_service/authzzie.py
+@@ -12,7 +12,8 @@
+ import copy
+-from collections import Iterable, defaultdict
++from collections.abc import Iterable
++from collections import defaultdict
+ from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
+
+ from typing_extensions import Protocol
