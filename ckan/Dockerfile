@@ -18,16 +18,16 @@ RUN for d in $APP_DIR/patches/*; do \
         fi ; \
     done
 
-# Install pipx and ensure the path is set correctly
-RUN python3 -m pip install --user pipx && \
-    python3 -m pipx ensurepath && \
-    source ~/.profile
 
-
-# Add pipx to PATH
+# pipenv
+RUN pip install pipenv --user
 ENV PATH=/root/.local/bin:$PATH
-RUN pipx install poetry
+
+ENV VENV /srv/app
+RUN python -m venv $VENV
+ENV PATH="$VENV/bin:$PATH"
 
 # Switch to the application directory and initialize poetry
 WORKDIR ${APP_DIR}
-RUN poetry init --no-interaction --name=ckan --description="CKAN project" --author="CKAN Team <team@ckan.org>" --dependency=flask@^2.0
+ADD Pipfile.lock ${APP_DIR}
+RUN pipenv sync
