@@ -17,3 +17,8 @@ RUN for d in $APP_DIR/patches/*; do \
             done ; \
         fi ; \
     done
+
+# Installing Pipx \
+RUN python3 -m pip install --user pipx && \
+    python3 -m pipx ensurepath
+
