@@ -27,7 +27,6 @@ ENV VENV /srv/app
 RUN python -m venv $VENV
 ENV PATH="$VENV/bin:$PATH"
 
-# Switch to the application directory and initialize poetry
 WORKDIR ${APP_DIR}
 ADD Pipfile.lock ${APP_DIR}
 RUN pipenv sync
