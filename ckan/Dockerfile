@@ -24,6 +24,3 @@ RUN for d in $APP_DIR/patches/*; do \
             done ; \
         fi ; \
     done
-
-# Install rsync
-RUN apk update && apk add --no-cache rsync
