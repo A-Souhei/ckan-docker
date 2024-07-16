@@ -18,17 +18,21 @@ RUN for d in $APP_DIR/patches/*; do \
         fi ; \
     done
 
-RUN pip install psycopg2==2.9.9
-
-# pipenv
-RUN pip install pipenv --user
-ENV PATH=/root/.local/bin:$PATH
-
-ENV VENV /srv/app
-RUN python -m venv $VENV
-ENV PATH="$VENV/bin:$PATH"
-
+# Install necessary dependencies
+RUN apk add --no-cache \
+    gcc \
+    libffi-dev \
+    openssl-dev \
+    python3-dev \
+    make \
+    musl-dev \
+    linux-headers
+# Set working directory
 WORKDIR ${APP_DIR}
-ADD Pipfile ${APP_DIR}
-ADD Pipfile.lock ${APP_DIR}
-RUN pipenv install
+
+# Copy the requirements.txt file
+COPY requirements.txt ${APP_DIR}/requirements.txt
+
+# Install the Python packages using pip
+RUN pip install -r requirements.txt
+
