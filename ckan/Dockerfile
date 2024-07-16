@@ -18,6 +18,7 @@ RUN for d in $APP_DIR/patches/*; do \
         fi ; \
     done
 
+RUN pip install psycopg2==2.9.9
 
 # pipenv
 RUN pip install pipenv --user
@@ -28,5 +29,6 @@ RUN python -m venv $VENV
 ENV PATH="$VENV/bin:$PATH"
 
 WORKDIR ${APP_DIR}
+ADD Pipfile ${APP_DIR}
 ADD Pipfile.lock ${APP_DIR}
-RUN pipenv sync
+RUN pipenv install
