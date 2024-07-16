@@ -1,0 +1,4 @@
+giftless-client==0.1.1
+psycopg2==2.9.9
+-e git+https://github.com/datopian/ckanext-authz-service@master#egg=ckanext-authz-service
+-e git+https://github.com/datopian/ckanext-blob-storage@d264f86a532de1c1f879dd9f93582d8dc0877d1e#egg=ckanext-blob-storage
