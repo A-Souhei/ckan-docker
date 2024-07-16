@@ -1,0 +1,26 @@
+{
+    "_meta": {
+        "hash": {
+            "sha256": "e7563c237de44c7289488195c53a5d61c62cdbdb6385b16b0f96887b363ae938"
+        },
+        "pipfile-spec": 6,
+        "requires": {
+            "python_version": "3.10"
+        },
+        "sources": [
+            {
+                "name": "pypi",
+                "url": "https://pypi.org/simple",
+                "verify_ssl": true
+            }
+        ]
+    },
+    "default": {
+        "ckanext-authz-service": {
+            "editable": true,
+            "git": "https://github.com/datopian/ckanext-authz-service",
+            "ref": "d179b19469faff7e461191db53e31c60d19003bc"
+        }
+    },
+    "develop": {}
+}

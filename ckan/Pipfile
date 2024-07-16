@@ -1,0 +1,12 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+ckanext-authz-service = {editable = true, ref = "d179b19469faff7e461191db53e31c60d19003bc", git = "https://github.com/datopian/ckanext-authz-service"}
+
+[dev-packages]
+
+[requires]
+python_version = "3.10"
