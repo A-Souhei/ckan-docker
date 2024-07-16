@@ -5,7 +5,8 @@ name = "pypi"
 
 [packages]
 giftless-client = "==0.1.1"
-ckanext-authz-service = {editable = true, ref = "d179b19469faff7e461191db53e31c60d19003bc", git = "https://github.com/datopian/ckanext-authz-service"}
+psycopg2 = "==2.9.9"
+ckanext-authz-service = {editable = true, ref = "master", git = "https://github.com/datopian/ckanext-authz-service"}
 ckanext-blob-storage = {editable = true, ref = "master", git = "https://github.com/datopian/ckanext-blob-storage"}
 
 [dev-packages]
