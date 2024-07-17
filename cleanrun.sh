@@ -1,3 +1,5 @@
 #!/bin/bash
 
-docker compose down -v && docker compose build ckan && docker compose up ckan
+docker volume create --driver local -o o=bind -o type=none -o device="/home/devx/Sources/ckan-docker/ckan/sources" ckan_app_dir
+docker compose down -v && docker compose build ckan && docker compose up -d
+sudo chmod -R 777 ~/Sources/ckan-docker/ckan/sources
