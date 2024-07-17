@@ -9,3 +9,4 @@ _src/*
 local/*
 .env
 /ckan/sources/
+/ckan/sources/*
