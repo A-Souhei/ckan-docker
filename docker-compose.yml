@@ -1,7 +1,6 @@
 volumes:
   ckan_storage:
   ckan_app_dir:
-    external: true
   pg_data:
   solr_data:
   pip_cache:
