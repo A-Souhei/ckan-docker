@@ -1,5 +1,7 @@
 volumes:
   ckan_storage:
+  ckan_app_dir:
+    external: true
   pg_data:
   solr_data:
   pip_cache:
@@ -44,6 +46,7 @@ services:
       - ckan_storage:/var/lib/ckan
       - pip_cache:/root/.cache/pip
       - site_packages:/usr/lib/python3.10/site-packages
+      - ckan_app_dir:/srv/app
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:5000"]
