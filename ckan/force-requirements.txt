@@ -1,0 +1,1 @@
+-e git+https://github.com/A-Souhei/ckanext-blob-storage.git@dev#egg=ckanext-blob-storage

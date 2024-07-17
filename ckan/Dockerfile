@@ -15,10 +15,12 @@ RUN apk add --no-cache \
 WORKDIR ${APP_DIR}
 
 # Copy the requirements.txt file
-COPY requirements.txt ${APP_DIR}/requirements.txt
+ADD requirements.txt ${APP_DIR}
+ADD force-requirements.txt ${APP_DIR}
 
 # Install the Python packages using pip
 RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r force-requirements.txt
 
 # Copy custom initialization scripts
 COPY docker-entrypoint.d/* /docker-entrypoint.d/
