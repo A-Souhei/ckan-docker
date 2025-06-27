@@ -1,7 +1,7 @@
 # Makefile for CKAN Docker project
 
 # CKAN version to build
-VERSION = 2.11
+VERSION ?= 2.11
 
 # Directory containing CKAN image build scripts
 CKAN_IMAGE_DIR = ckan-docker-base
