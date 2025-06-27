@@ -1,0 +1,3 @@
+[submodule "ckan-docker-base"]
+	path = ckan-docker-base
+	url = git@github.com:A-Souhei/ckan-docker-base.git
