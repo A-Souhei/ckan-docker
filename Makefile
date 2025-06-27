@@ -9,7 +9,10 @@ CKAN_IMAGE_DIR = ckan-docker-base
 # Default goal - show help when running 'make' without arguments
 .DEFAULT_GOAL := help
 
-.PHONY: build-base build-dev build-all help
+.PHONY: build-base build-dev build-all help setup
+
+setup: ## Initialize submodules
+	git submodule update --init --recursive
 
 help: ## Show this help message
 	@echo "CKAN Docker Build Commands:"
