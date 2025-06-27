@@ -3,6 +3,9 @@
 # CKAN version to build
 VERSION = 2.11
 
+# Default goal - show help when running 'make' without arguments
+.DEFAULT_GOAL := help
+
 .PHONY: build-base build-dev build-all help
 
 help: ## Show this help message
