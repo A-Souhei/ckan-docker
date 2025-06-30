@@ -1,0 +1,156 @@
+version: '3.8'
+
+volumes:
+  ckan_storage:
+  pg_data:
+  solr_data:
+  pip_cache:
+  site_packages:
+  local_bin:
+  home_dir:
+
+networks:
+  ckan-dev-network:
+    driver: overlay
+    attachable: true
+
+services:
+
+  ckan-dev:
+    image: ckan-dev:latest
+    build:
+      context: ckan/
+      dockerfile: Dockerfile.dev
+      args:
+        - TZ=${TZ:-UTC}
+    environment:
+      # Core CKAN settings with defaults
+      - CKAN_SITE_URL=${CKAN_SITE_URL:-http://localhost:5000}
+      - CKAN_SQLALCHEMY_URL=${CKAN_SQLALCHEMY_URL:-postgresql://ckandbuser:ckandbpassword@db/ckandb}
+      - CKAN_DATASTORE_WRITE_URL=${CKAN_DATASTORE_WRITE_URL:-postgresql://ckandbuser:ckandbpassword@db/datastore}
+      - CKAN_DATASTORE_READ_URL=${CKAN_DATASTORE_READ_URL:-postgresql://datastore_ro:datastore@db/datastore}
+      - CKAN_SOLR_URL=${CKAN_SOLR_URL:-http://solr:8983/solr/ckan}
+      - CKAN_REDIS_URL=${CKAN_REDIS_URL:-redis://redis:6379/1}
+      - CKAN___BEAKER__SESSION__SECRET=${CKAN___BEAKER__SESSION__SECRET:-CHANGE_ME}
+      - CKAN___API_TOKEN__JWT__ENCODE__SECRET=${CKAN___API_TOKEN__JWT__ENCODE__SECRET:-string:CHANGE_ME}
+      - CKAN___API_TOKEN__JWT__DECODE__SECRET=${CKAN___API_TOKEN__JWT__DECODE__SECRET:-string:CHANGE_ME}
+      - CKAN_SYSADMIN_NAME=${CKAN_SYSADMIN_NAME:-ckan_admin}
+      - CKAN_SYSADMIN_PASSWORD=${CKAN_SYSADMIN_PASSWORD:-test1234}
+      - CKAN_SYSADMIN_EMAIL=${CKAN_SYSADMIN_EMAIL:-admin@example.com}
+      - CKAN_STORAGE_PATH=${CKAN_STORAGE_PATH:-/var/lib/ckan}
+      - TZ=${TZ:-UTC}
+    networks:
+      - ckan-dev-network
+    ports:
+      - target: 5000
+        published: ${CKAN_PORT_HOST:-5000}
+        protocol: tcp
+        mode: host
+    volumes:
+      - ckan_storage:/var/lib/ckan
+      - ./src:/srv/app/src_extensions
+      - pip_cache:/root/.cache/pip
+      - site_packages:/usr/local/lib/python3.10/site-packages
+      - local_bin:/usr/local/bin
+      - home_dir:/srv/app/
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      placement:
+        constraints:
+          - node.role == manager
+    depends_on:
+      - db
+      - solr
+      - redis
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:5000"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+
+  datapusher:
+    image: ckan/ckan-base-datapusher:${DATAPUSHER_VERSION:-0.0.21}
+    networks:
+      - ckan-dev-network
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:8800"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+
+  db:
+    image: ckan-postgres-dev:latest
+    build:
+      context: postgresql/
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-postgres}
+      - CKAN_DB_USER=${CKAN_DB_USER:-ckandbuser}
+      - CKAN_DB_PASSWORD=${CKAN_DB_PASSWORD:-ckandbpassword}
+      - CKAN_DB=${CKAN_DB:-ckandb}
+      - DATASTORE_READONLY_USER=${DATASTORE_READONLY_USER:-datastore_ro}
+      - DATASTORE_READONLY_PASSWORD=${DATASTORE_READONLY_PASSWORD:-datastore}
+      - DATASTORE_DB=${DATASTORE_DB:-datastore}
+    networks:
+      - ckan-dev-network
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      placement:
+        constraints:
+          - node.role == manager
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER:-postgres}", "-d", "${POSTGRES_DB:-postgres}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  solr:
+    image: ckan/ckan-solr:${SOLR_IMAGE_VERSION:-2.10-solr9}
+    networks:
+      - ckan-dev-network
+    volumes:
+      - solr_data:/var/solr
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:8983/solr/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis:
+    image: redis:${REDIS_VERSION:-7}
+    networks:
+      - ckan-dev-network
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+    healthcheck:
+      test: ["CMD", "redis-cli", "-e", "QUIT"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

@@ -1,0 +1,94 @@
+#!/bin/bash
+
+# Docker Swarm Development Management Script for CKAN
+
+STACK_NAME="ckan-dev"
+COMPOSE_FILE="docker-swarm.dev.yml"
+
+case "$1" in
+    init)
+        echo "Initializing Docker Swarm..."
+        docker swarm init --advertise-addr $(hostname -I | awk '{print $1}')
+        echo "Docker Swarm initialized successfully!"
+        ;;
+    deploy)
+        echo "Deploying CKAN development stack..."
+        docker stack deploy -c $COMPOSE_FILE $STACK_NAME
+        echo "Stack deployed! Use 'docker stack ps $STACK_NAME' to check status."
+        ;;
+    remove)
+        echo "Removing CKAN development stack..."
+        docker stack rm $STACK_NAME
+        echo "Stack removed!"
+        ;;
+    ps)
+        echo "Checking stack services..."
+        docker stack ps $STACK_NAME
+        ;;
+    services)
+        echo "Listing stack services..."
+        docker stack services $STACK_NAME
+        ;;
+    logs)
+        if [ -z "$2" ]; then
+            echo "Usage: $0 logs <service_name>"
+            echo "Available services: ckan-dev, db, solr, redis, datapusher"
+            exit 1
+        fi
+        echo "Showing logs for service: $2"
+        docker service logs ${STACK_NAME}_$2 --follow
+        ;;
+    update)
+        echo "Updating CKAN development service..."
+        docker service update --force ${STACK_NAME}_ckan-dev
+        ;;
+    scale)
+        if [ -z "$2" ] || [ -z "$3" ]; then
+            echo "Usage: $0 scale <service_name> <replicas>"
+            exit 1
+        fi
+        echo "Scaling $2 to $3 replicas..."
+        docker service scale ${STACK_NAME}_$2=$3
+        ;;
+    build)
+        echo "Building images for swarm deployment..."
+        docker build -t ckan-dev:latest -f ckan/Dockerfile.dev ckan/
+        docker build -t ckan-postgres-dev:latest postgresql/
+        echo "Images built successfully!"
+        ;;
+    status)
+        echo "=== Docker Swarm Status ==="
+        docker node ls
+        echo ""
+        echo "=== Stack Services ==="
+        docker stack services $STACK_NAME 2>/dev/null || echo "Stack not deployed"
+        echo ""
+        echo "=== Stack Tasks ==="
+        docker stack ps $STACK_NAME 2>/dev/null || echo "Stack not deployed"
+        ;;
+    *)
+        echo "Docker Swarm CKAN Development Management"
+        echo ""
+        echo "Usage: $0 {init|deploy|remove|ps|services|logs|update|scale|build|status}"
+        echo ""
+        echo "Commands:"
+        echo "  init     - Initialize Docker Swarm on this machine"
+        echo "  build    - Build Docker images for swarm deployment"
+        echo "  deploy   - Deploy the CKAN development stack"
+        echo "  remove   - Remove the CKAN development stack"
+        echo "  ps       - Show stack tasks/containers"
+        echo "  services - Show stack services"
+        echo "  logs     - Show logs for a specific service"
+        echo "  update   - Force update the CKAN development service"
+        echo "  scale    - Scale a service to specified replicas"
+        echo "  status   - Show overall swarm and stack status"
+        echo ""
+        echo "Examples:"
+        echo "  $0 init"
+        echo "  $0 build"
+        echo "  $0 deploy"
+        echo "  $0 logs ckan-dev"
+        echo "  $0 scale redis 2"
+        exit 1
+        ;;
+esac
